@@ -1,65 +1,72 @@
 <!DOCTYPE html>
 <html>
-  <head>
-      <meta charset="utf-8" />
-      <link rel="stylesheet" href="{{ url_for('static', filename='globals.css') }}" />
-      <link rel="stylesheet" href="{{ url_for('static', filename='styleguide.css') }}" />
-      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-      <style>
-        body {
-          background: url("{{ url_for('static', filename='img/background.png') }}") center;
-          margin: 0;
-          height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        
-        .container {
-          position: relative;
-          width: 777px;
-          height: 583px;
-        }
 
-        .rectangle {
-          width: 100%;
-          height: 100%;
-          display: block;
-        }
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='globals.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styleguide.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    body {
+      background: url("{{ url_for('static', filename='img/background.png') }}") center;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-      .button, .button2 {
-        position: absolute;
-        width: 273px;
-        height: 243px;
-        transition: transform 0.3s ease;
-        cursor: pointer;
-      }
+    .container {
+      position: relative;
+      width: 777px;
+      height: 583px;
+    }
 
-      .button {
-        top: 250px;
-        left: 100px;
-      }
+    .rectangle {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
-      .button2 {
-        top: 250px;
-        right: 100px;
-      }
+    .button,
+    .button2 {
+      position: absolute;
+      width: 273px;
+      height: 243px;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
 
-      .button:hover, .button2:hover {
-        transform: scale(1.05);
-      }
-    </style>
-  </head>
+    .button {
+      top: 250px;
+      left: 100px;
+    }
 
-  <body>
-    <div class="container">
-      <img class="rectangle" src="{{ url_for('static', filename='img/rectangle3.png') }}" />
+    .button2 {
+      top: 250px;
+      right: 100px;
+    }
 
+    .button:hover,
+    .button2:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <form action="/cure_method" method="post">
+      <button type="submit" name="isSelf" value="true" style="all: unset; border: none; padding: 0; background: none;">
+        <img class="rectangle" src="{{ url_for('static', filename='img/rectangle3.png') }}" />
         <img class="button" src="{{ url_for('static', filename='img/group10.png') }}" />
+      </button>
 
-        <a href="{{ url_for('symptoms') }}">
-         <img class="button2" src="{{ url_for('static', filename='img/Group11.png') }}" />
-        </a>
-    </div>
-  </body>
+      <a href="{{ url_for('symptoms') }}">
+        <img class="button2" src="{{ url_for('static', filename='img/Group11.png') }}" />
+      </a>
+    </form>
+  </div>
+</body>
+
 </html>

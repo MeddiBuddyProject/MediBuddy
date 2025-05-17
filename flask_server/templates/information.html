@@ -1,80 +1,79 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='globals.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styleguide.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <style>
-      body {
-        background: url("{{ url_for('static', filename='img/background.png') }}") center;
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
 
-      .container {
-        position: relative;
-        width: 777px;
-        height: 583px;
-      }
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='globals.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styleguide.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    body {
+      background: url("{{ url_for('static', filename='img/background.png') }}") center;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-      .rectangle {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
+    .container {
+      position: relative;
+      width: 777px;
+      height: 583px;
+    }
 
-      .confirm {
-        position: absolute;
-        top: 450px;
-        left: 170px;
-        width: 397px;
-        height: 60px;
-        transition: transform 0.3s ease;
-        cursor: pointer;
-      }
+    .rectangle {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
-      .confirm:hover {
-        transform: scale(1.05);
-      }
+    .confirm {
+      position: absolute;
+      top: 450px;
+      left: 170px;
+      width: 397px;
+      height: 60px;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
 
-      .icon-input {
-        position: absolute;
-        width: 263px;
-        height: 39px;
-        background: url("{{ url_for('static', filename='name.png') }}") no-repeat center center;
-        background-size: contain;
-        background-color: rgba(255, 255, 255, 0.5); /* 투명 배경 */
-        border: 1px solid rgba(0, 0, 0, 0.2);         
-        border-radius: 8px;
-        padding-left: 10px;
-        font-size: 14px;
-        color: black;
-        appearance: none;
-      }
+    .confirm:hover {
+      transform: scale(1.05);
+    }
 
-      .icon-input:focus {
-        outline: none;
-      }
-    </style>
-  </head>
+    .icon-input {
+      position: absolute;
+      width: 263px;
+      height: 39px;
+      background: url("{{ url_for('static', filename='name.png') }}") no-repeat center center;
+      background-size: contain;
+      background-color: rgba(255, 255, 255, 0.5);
+      /* 투명 배경 */
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding-left: 10px;
+      font-size: 14px;
+      color: black;
+      appearance: none;
+    }
 
-  <body>
-    <div class="container">
-      <img class="rectangle" src="static/img/rectangle_information.png" />
+    .icon-input:focus {
+      outline: none;
+    }
+  </style>
+</head>
 
-      <a href="{{ url_for('cure_method') }}">
-      <img class="confirm" src="{{ url_for('static', filename='img/confirm.png') }}" />
-      </a>
+<body>
+  <div class="container">
+    <img class="rectangle" src="static/img/rectangle_information.png" />
 
+    <form action="/information" method="post">
       <!-- 이름 입력 -->
-      <input type="text" class="icon-input" placeholder="이름" style="top: 150px; left: 240px;" />
+      <input type="text" name="name" class="icon-input" placeholder="이름" style="top: 150px; left: 240px;" />
 
       <!-- 학년 선택 -->
-      <select class="icon-input" style="top: 230px; left: 240px;">
+      <select name="grade" class="icon-input" style="top: 230px; left: 240px;">
         <option disabled selected>학년</option>
         <option value="1">1학년</option>
         <option value="2">2학년</option>
@@ -82,21 +81,29 @@
       </select>
 
       <!-- 반 선택 -->
-      <select class="icon-input" style="top: 300px; left: 240px;">
+      <select name="ban" class="icon-input" style="top: 300px; left: 240px;">
         <option disabled selected>반</option>
         {% for class_num in range(1, 7) %}
-          <option value="{{ class_num }}">{{ class_num }}반</option>
+        <option value="{{ class_num }}">{{ class_num }}반</option>
         {% endfor %}
       </select>
 
       <!-- 번호 선택 -->
-      <select class="icon-input" style="top: 380px; left: 240px;">
+      <select name="number" class="icon-input" style="top: 380px; left: 240px;">
         <option disabled selected>번호</option>
         {% for num in range(1, 19) %}
-          <option value="{{ num }}">{{ num }}번</option>
+        <option value="{{ num }}">{{ num }}번</option>
         {% endfor %}
       </select>
 
-    </div>
-  </body>
+      <button type="submit" style="all: unset; border: none; padding: 0; background: none;">
+        <a href="{{ url_for('cure_method') }}">
+          <img class="confirm" src="{{ url_for('static', filename='img/confirm.png') }}" />
+        </a>
+      </button>
+
+    </form>
+  </div>
+</body>
+
 </html>
