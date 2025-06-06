@@ -2,74 +2,75 @@
 <html>
 
 <head>
-  <meta charset="utf-8" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='globals.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='styleguide.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <style>
-    body {
-      background: url("{{ url_for('static', filename='img/background.png') }}") center;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='globals.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleguide.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+    <style>
+        body {
+          background: url("{{ url_for('static', filename='img/background.png') }}") center;
+          margin: 0;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
 
-    .container {
-      position: relative;
-      width: 777px;
-      height: 583px;
-    }
+        .container {
+          position: relative;
+          width: 777px;
+          height: 583px;
+        }
 
-    .rectangle {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
+        .rectangle {
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
 
-    .button,
-    .button2 {
-      position: absolute;
-      width: 273px;
-      height: 243px;
-      transition: transform 0.3s ease;
-      cursor: pointer;
-    }
+        .button,
+        .button2 {
+          position: absolute;
+          width: 273px;
+          height: 243px;
+          transition: transform 0.3s ease;
+          cursor: pointer;
+        }
 
-    .button {
-      top: 250px;
-      left: 100px;
-    }
+        .button {
+          top: 250px;
+          left: 100px;
+        }
 
-    .button2 {
-      top: 250px;
-      right: 100px;
-    }
+        .button2 {
+          top: 250px;
+          right: 100px;
+        }
 
-    .button:hover,
-    .button2:hover {
-      transform: scale(1.05);
-    }
-  </style>
+        .button:hover,
+        .button2:hover {
+          transform: scale(1.05);
+        }
+    </style>
 </head>
 
 <body>
-  <div class="container">
-    <img class="rectangle" src="{{ url_for('static', filename='img/rectangle2.png') }}" />
+<div class="container">
+    <img class="rectangle" src="{{ url_for('static', filename='img/rectangle2.png') }}"/>
 
     <form action="/move" method="post">
-      <button type="submit" name="select" value="reservation" style="all: unset; border: none; padding: 0; background: none;">
-        <a href="{{ url_for('information') }}">
-          <img class="button" src="{{ url_for('static', filename='img/group-8.png') }}" />
-        </a>
-      </button>
+        <button type="submit" name="select" value="reservation"
+                style="all: unset; border: none; padding: 0; background: none;">
+            <img class="button" src="{{ url_for('static', filename='img/group-8.png') }}"/>
+        </button>
 
-      <button type="submit" name="select" value="reservation" style="all: unset; border: none; padding: 0; background: none;">
-         <img class="button2" src="{{ url_for('static', filename='img/group-9.png') }}" />
-      </button>
+        <button type="submit" name="select" value="other_option"
+                style="all: unset; border: none; padding: 0; background: none;">
+            <img class="button2" src="{{ url_for('static', filename='img/group-9.png') }}"/>
+        </button>
     </form>
-  </div>
+
+</div>
 </body>
 
 </html>
