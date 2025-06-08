@@ -122,7 +122,7 @@
                         <p class="name">{{ item.name }}</p>
                         <p class="cure">{{ "자가치료" if item.isSelf else "선생님 치료" }}</p>
                         <p class="symptoms">{{ item.symptoms }}</p>
-                        <input type="checkbox" class="checkBox" name="delete_ids" value="{{ item.StudentNumber }}">
+                        <input type="checkbox" class="checkBox" name="delete_ids" value="{{ item.StudentNumber }}" {% if item.check %} checked {% endif %}>
                     </div>
                     {% endfor %}
                 </div>
@@ -130,7 +130,7 @@
                     <img class="check" src="{{ url_for('static', filename='img/check.svg') }}" alt="check">
                 </button>
             </form>
-        </div> 
+        </div>
     </div>
 </body>
 
