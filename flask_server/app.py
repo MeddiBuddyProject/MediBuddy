@@ -13,8 +13,8 @@ reservations = []
 
 @app.route('/')
 def index():
-    return render_template('index.html')
-
+    return render_template('information.html')
+    
 @app.route('/move', methods=['POST'])
 def move():
     select = request.form['select']
