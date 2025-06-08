@@ -1,105 +1,136 @@
-from flask import Flask, render_template, request,jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for
+from pymongo import MongoClient
+from datetime import datetime
 
-app = Flask(__name__)   
+app = Flask(__name__)
 
-# DB 대신 배열
-reservations = [
+mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.346h16q.mongodb.net/?retryWrites=true&w=majority&appName=MediBuddy"
+client = MongoClient(mongo_uri)
+
+db = client['medibuddy_db']
+students = db['students']
+health_records = db['health_records']
+
+sample_students = [
+    {"student_id": "2107", "name": "이상연", "password": "1111"},
+    {"student_id": "2110", "name": "임채이", "password": "2222"},
+    {"student_id": "2115", "name": "조현서", "password": "3333"},
+]
+students.insert_many(sample_students)
+
+sample_health_records = [
     {
-        'StudentNumber': '2115',
-        'date': '25/06/04',
-        'name': '조현서',
-        'isSelf': True,
-        'symptoms': '복통'
+        "date": datetime(2025, 6, 6),
+        "student_id": "2107",
+        "name": "이상연",
+        "treatment": "스스로 치료",
+        "symptom_checked": True,
+        "symptoms": "코피"
     },
     {
-        'StudentNumber': '2116',
-        'date': '25/06/05',
-        'name': '김철수',
-        'isSelf': False,
-        'symptoms': '두통'
+        "date": datetime(2025, 6, 5),
+        "student_id": "2110",
+        "name": "임채이",
+        "treatment": "스스로 치료",
+        "symptom_checked": False,
+        "symptoms": "타박상"
     },
     {
-        'StudentNumber': '2117',
-        'date': '25/06/06',
-        'name': '박민지',
-        'isSelf': True,
-        'symptoms': '기침'
+        "date": datetime(2025, 6, 4),
+        "student_id": "2115",
+        "name": "조현서",
+        "treatment": "보건 선생님 도움",
+        "symptom_checked": True,
+        "symptoms": "복통"
     }
 ]
-
-# # MySQL 데이터베이스 연결
-# app.config['SQLALCHEMY_DATABASE_URI'] = ''
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+health_records.insert_many(sample_health_records)
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('information.html')
 
 @app.route('/move', methods=['POST'])
 def move():
-    select = request.form['select']
+    select = request.form.get('select')
     if select == 'reservation':
-        return render_template('information.html')
+        return redirect(url_for('information'))
+    return redirect(url_for('index'))
+
 
 @app.route('/information', methods=['GET', 'POST'])
 def information():
     if request.method == 'POST':
-        
-        number = request.form['number']
-        name = request.form['name']
-        password = request.form['password']
+        name = request.form.get('name')
+        grade = request.form.get('grade')
+        ban = request.form.get('ban')
+        number = request.form.get('number')
 
-        reservations.append({"name": name, "StudentNumber": number, "password" : password , "isSelf" : None,"symptom" : None, "check" : False})
-        print(reservations)
-        return render_template('cure_method.html')
-    
+        student_id = f"{grade}{ban}{number}".zfill(4)
+
+        students.update_one(
+            {"student_id": student_id}, 
+            {"$set": {"name": name}},
+            upsert=True
+        )
+
+        app.config['current_record'] = {
+            "student_id": student_id,
+            "name": name,
+            "date": datetime.now()
+        }
+
+        return redirect(url_for('cure_method'))
+
     return render_template('information.html')
+
 
 @app.route('/cure_method', methods=['GET', 'POST'])
 def cure_method():
     if request.method == 'POST':
-        isSelf = request.form['isSelf']
+        treatment = request.form.get('isSelf')
 
-        if reservations:
-            reservations[-1]['symptoms'] = symptoms
-            if isSelf == "true" :
-                reservations[-1]['isSelf'] = True
-            else :
-                reservations[-1]['isSelf'] = False
-            return render_template('symptoms.html')
-        else:
-            return "저장할 예약 정보가 없습니다.", 400
-        
+        if 'current_record' not in app.config:
+            return "저장된 환자 정보가 없습니다.", 400
+
+        app.config['current_record']['treatment'] = treatment
+        return redirect(url_for('symptoms'))
+
     return render_template('cure_method.html')
+
 
 @app.route('/symptoms', methods=['GET', 'POST'])
 def symptoms():
     if request.method == 'POST':
-        symptoms = request.form['symptoms']
+        symptoms = request.form.get('symptoms')
 
-        if reservations:
-            reservations[-1]['symptoms'] = symptoms
-            return render_template('symptoms.html')
-        else:
-            return "저장할 예약 정보가 없습니다.", 400
+        if 'current_record' not in app.config:
+            return "저장된 환자 정보가 없습니다.", 400
 
-    return render_template('final.html')
+        record = app.config['current_record']
+        symptom_checked = bool(symptoms and symptoms.strip())
+
+        health_records.insert_one({
+            "date": record['date'],
+            "student_id": record['student_id'],
+            "name": record['name'],
+            "treatment": record.get('treatment', ''),
+            "symptom_checked": symptom_checked,
+            "symptoms": symptoms
+        })
+
+        app.config.pop('current_record', None)
+
+        return redirect(url_for('final'))
+
+    return render_template('symptoms.html')
+
 
 @app.route('/final')
 def final():
     return render_template('final.html')
 
-@app.route('/list', methods=['GET', 'POST'])
-def list():
-
-    if request.method == 'POST':
-
-        return render_template('list.html')
-    
-    return render_template('index.html')
-
 
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1')
+    app.run(debug=True)
