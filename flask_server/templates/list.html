@@ -43,7 +43,7 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            height: 100%;
+            height: 530px;
             z-index: 1;
 
             overflow-y: auto;
@@ -118,11 +118,18 @@
                     {% for item in reservations %}
                     <div class="list">
                         <p class="date">{{ item.date if item.date else "날짜 없음" }}</p>
-                        <p class="studentNum">{{ item.StudentNumber }}</p>
+                        <p class="studentNum">{{ item.student_id }}</p>
                         <p class="name">{{ item.name }}</p>
-                        <p class="cure">{{ "자가치료" if item.isSelf else "선생님 치료" }}</p>
+                        <p class="cure">
+                            {% if item.treatment == "스스로 치료" %}
+                            자가치료
+                            {% else %}
+                            선생님 치료
+                            {% endif %}
+                        </p>
                         <p class="symptoms">{{ item.symptoms }}</p>
-                        <input type="checkbox" class="checkBox" name="delete_ids" value="{{ item.StudentNumber }}" {% if item.check %} checked {% endif %}>
+                        <input type="checkbox" class="checkBox" name="delete_ids" value="{{ item.student_id }}" {% if
+                            item.check %} checked {% endif %}>
                     </div>
                     {% endfor %}
                 </div>
