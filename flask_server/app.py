@@ -4,7 +4,10 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.346h16q.mongodb.net/?retryWrites=true&w=majority&appName=MediBuddy"
+# mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.346h16q.mongodb.net/?retryWrites=true&w=majority&appName=MediBuddy"
+
+mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.co5u3aq.mongodb.net/?retryWrites=true&w=majority&appName=medibuddy"
+
 client = MongoClient(mongo_uri)
 
 db = client['medibuddy_db']
@@ -49,8 +52,7 @@ health_records.insert_many(sample_health_records)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
-
+    return render_template('information.html')
 
 @app.route('/move', methods=['POST'])
 def move():
@@ -132,6 +134,37 @@ def symptoms():
 def final():
     return render_template('final.html')
 
+from flask import request, redirect, url_for
+from bson.objectid import ObjectId
+
+@app.route('/list', methods=['GET', 'POST'])
+def list_records():
+    if request.method == 'POST':
+        delete_ids = request.form.getlist('delete_ids')
+        if delete_ids:
+            health_records.delete_many({"student_id": {"$in": delete_ids}})
+            return redirect(url_for('list_records'))
+        
+        student_id = request.form.get('student_id')
+    else:
+        student_id = request.args.get('student_id')
+
+    query = {}
+    if student_id:
+        query['student_id'] = student_id
+    
+    records = list(health_records.find(query).sort("date", -1))
+    
+    for record in records:
+        record['_id'] = str(record['_id'])
+        if 'date' in record and isinstance(record['date'], datetime):
+            record['date'] = record['date'].strftime("%Y-%m-%d")
+    
+    return render_template('information.html', reservations=records)
+
+
+
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=5001)
