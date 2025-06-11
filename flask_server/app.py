@@ -4,9 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.346h16q.mongodb.net/?retryWrites=true&w=majority&appName=MediBuddy"
-
-mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.co5u3aq.mongodb.net/?retryWrites=true&w=majority&appName=medibuddy"
+mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.346h16q.mongodb.net/?retryWrites=true&w=majority&appName=MediBuddy"
 
 client = MongoClient(mongo_uri)
 
@@ -54,6 +52,7 @@ health_records.insert_many(sample_health_records)
 def index():
     return render_template('information.html')
 
+
 @app.route('/move', methods=['POST'])
 def move():
     select = request.form.get('select')
@@ -73,7 +72,7 @@ def information():
         student_id = f"{grade}{ban}{number}".zfill(4)
 
         students.update_one(
-            {"student_id": student_id}, 
+            {"student_id": student_id},
             {"$set": {"name": name}},
             upsert=True
         )
@@ -132,10 +131,28 @@ def symptoms():
 
 @app.route('/final')
 def final():
-    return render_template('final.html')
+    r = health_records.find_one(sort=[('date', -1)])
+    if not r:
+        return render_template('final.html', info={})
+
+    sid, name, date = r['student_id'], r['name'], r['date']
+
+    all = list(health_records.find().sort("date", 1))
+    wait = list(health_records.find({"treatment": {"$exists": False}}).sort("date", 1))
+
+    entry = next((i+1 for i, x in enumerate(all) if x['student_id'] == sid and x['date'] == date), -1)
+    wnum = next((i+1 for i, x in enumerate(wait) if x['student_id'] == sid and x['date'] == date), -1)
+    wcount = len(wait)
+
+    return render_template('final.html', info={
+        'entry': entry, 'name': name, 'wait_num': wnum, 'wait_count': wcount
+    })
+
+
 
 from flask import request, redirect, url_for
 from bson.objectid import ObjectId
+
 
 @app.route('/list', methods=['GET', 'POST'])
 def list_records():
@@ -144,7 +161,7 @@ def list_records():
         if delete_ids:
             health_records.delete_many({"student_id": {"$in": delete_ids}})
             return redirect(url_for('list_records'))
-        
+
         student_id = request.form.get('student_id')
     else:
         student_id = request.args.get('student_id')
@@ -152,19 +169,16 @@ def list_records():
     query = {}
     if student_id:
         query['student_id'] = student_id
-    
+
     records = list(health_records.find(query).sort("date", -1))
-    
+
     for record in records:
         record['_id'] = str(record['_id'])
         if 'date' in record and isinstance(record['date'], datetime):
             record['date'] = record['date'].strftime("%Y-%m-%d")
-    
-    return render_template('information.html', reservations=records)
 
-
-
+    return render_template('list.html', reservations=records)
 
 
 if __name__ == '__main__':
-    app.run(debug=True,port=5001)
+    app.run(debug=True, port=5001)
