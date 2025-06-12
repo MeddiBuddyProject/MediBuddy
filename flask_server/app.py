@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
 from datetime import datetime
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
 mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.346h16q.mongodb.net/?retryWrites=true&w=majority&appName=MediBuddy"
+
 
 client = MongoClient(mongo_uri)
 
@@ -19,6 +21,7 @@ sample_students = [
 ]
 students.insert_many(sample_students)
 
+
 sample_health_records = [
     {
         "date": datetime(2025, 6, 6),
@@ -26,7 +29,8 @@ sample_health_records = [
         "name": "이상연",
         "treatment": "스스로 치료",
         "symptom_checked": True,
-        "symptoms": "코피"
+        "symptoms": "코피",
+        "confirmation": False  
     },
     {
         "date": datetime(2025, 6, 5),
@@ -34,7 +38,8 @@ sample_health_records = [
         "name": "임채이",
         "treatment": "스스로 치료",
         "symptom_checked": False,
-        "symptoms": "타박상"
+        "symptoms": "타박상",
+        "confirmation": False  
     },
     {
         "date": datetime(2025, 6, 4),
@@ -42,16 +47,17 @@ sample_health_records = [
         "name": "조현서",
         "treatment": "보건 선생님 도움",
         "symptom_checked": True,
-        "symptoms": "복통"
+        "symptoms": "복통",
+        "confirmation": False  
     }
 ]
+
 health_records.insert_many(sample_health_records)
 
 
 @app.route('/')
 def index():
     return render_template('information.html')
-
 
 @app.route('/move', methods=['POST'])
 def move():
@@ -72,7 +78,7 @@ def information():
         student_id = f"{grade}{ban}{number}".zfill(4)
 
         students.update_one(
-            {"student_id": student_id},
+            {"student_id": student_id}, 
             {"$set": {"name": name}},
             upsert=True
         )
@@ -119,7 +125,8 @@ def symptoms():
             "name": record['name'],
             "treatment": record.get('treatment', ''),
             "symptom_checked": symptom_checked,
-            "symptoms": symptoms
+            "symptoms": symptoms,
+            "confirmation": False
         })
 
         app.config.pop('current_record', None)
@@ -148,30 +155,23 @@ def final():
         'entry': entry, 'name': name, 'wait_num': wnum, 'wait_count': wcount
     })
 
-
-
-from flask import request, redirect, url_for
-from bson.objectid import ObjectId
-
-
 @app.route('/list', methods=['GET', 'POST'])
 def list_records():
     if request.method == 'POST':
         delete_ids = request.form.getlist('delete_ids')
         if delete_ids:
-            health_records.delete_many({"student_id": {"$in": delete_ids}})
+            # ObjectId로 변환
+            object_ids = [ObjectId(id) for id in delete_ids]
+
+            health_records.update_many(
+                {"_id": {"$in": object_ids}},
+                {"$set": {"confirmation": True}} 
+            )
             return redirect(url_for('list_records'))
 
-        student_id = request.form.get('student_id')
-    else:
-        student_id = request.args.get('student_id')
-
-    query = {}
-    if student_id:
-        query['student_id'] = student_id
+    query = {"confirmation": False}
 
     records = list(health_records.find(query).sort("date", -1))
-
     for record in records:
         record['_id'] = str(record['_id'])
         if 'date' in record and isinstance(record['date'], datetime):
@@ -180,5 +180,17 @@ def list_records():
     return render_template('list.html', reservations=records)
 
 
+@app.route('/studentlist', methods=['GET', 'POST'])
+def studentlist():
+    query = {"student_id": "2115"}
+
+    records = list(health_records.find(query).sort("date", -1))
+    for record in records:
+        record['_id'] = str(record['_id'])
+        if 'date' in record and isinstance(record['date'], datetime):
+            record['date'] = record['date'].strftime("%Y-%m-%d")
+    
+    return render_template('studentlist.html', reservations=records)
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True,port=5001)
