@@ -1,104 +1,145 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="utf-8"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='globals.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styleguide.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
-    <style>
-        body {
-          background: url("{{ url_for('static', filename='img/background.png') }}") center;
-          margin: 0;
-          height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='globals.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styleguide.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    body {
+      background: url("{{ url_for('static', filename='img/background.png') }}") center;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .container {
-          position: relative;
-          width: 777px;
-          height: 583px;
-        }
+    .container {
+      position: relative;
+      width: 777px;
+      height: 583px;
+    }
 
-        .rectangle {
-          width: 100%;
-          height: 100%;
-          display: block;
-        }
+    .rectangle {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
-        .confirm {
-          position: absolute;
-          top: 450px;
-          left: 160px;
-          width: 220px;
-          height: 55spx;
-          transition: transform 0.3s ease;
-          cursor: pointer;
-        }
+    .confirm,
+    .cancel {
+      position: absolute;
+      top: 450px;
+      width: 100px;
+      height: 55px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
 
-        .cancel{
-                  position: absolute;
-          top: 450px;
-          right: 160px;
-          width: 220px;
-          height: 55spx;
-          transition: transform 0.3s ease;
-          cursor: pointer;
-        }
+    .confirm {
+      left: 100px;
+    }
 
-        .confirm:hover {
-          transform: scale(1.05);
-        }
+    .cancel {
+      right: 280px;
+    }
 
-        .cancel:hover {
-          transform: scale(1.05);
-        }
+    .confirm:hover,
+    .cancel:hover {
+      transform: scale(1.05);
+    }
 
-        .icon-input {
-          position: absolute;
-          width: 263px;
-          height: 39px;
-          background: url("{{ url_for('static', filename='name.png') }}") no-repeat center center;
-          background-size: contain;
-          background-color: rgba(255, 255, 255, 0.5); /* 투명 배경 */
-          border: 1px solid rgba(0, 0, 0, 0.2);
-          border-radius: 8px;
-          padding-left: 10px;
-          font-size: 14px;
-          color: black;
-          appearance: none;
-        }
+    .icon-input {
+      position: absolute;
+      width: 263px;
+      height: 39px;
+      background: url("{{ url_for('static', filename='name.png') }}") no-repeat center center;
+      background-size: contain;
+      background-color: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding-left: 10px;
+      font-size: 14px;
+      color: black;
+      appearance: none;
+    }
 
-        .icon-input:focus {
-          outline: none;
-        }
-    </style>
+    .icon-input:focus {
+      outline: none;
+    }
+
+    .info-box {
+      position: relative;
+      top: 30px;
+      left: 30px;
+    }
+
+    .entry {
+      position: absolute;
+      font-size: 28px;
+      color: darkgrey;
+      bottom: 480px;
+      left: 270px;
+    }
+
+    .name {
+      position: absolute;
+      font-size: 32px;
+      color: darkgrey;
+      bottom: 386px;
+      left: 90px;
+    }
+
+    .wait_num {
+      position: absolute;
+      font-size: 60px;
+      color: lightcoral;
+      bottom: 320px;
+      left: 500px;
+    }
+
+    .wait_count1 {
+      position: absolute;
+      color: darkgrey;
+      bottom: 302px;
+      left: 620px;
+    }
+
+    .wait_count2 {
+      position: absolute;
+      font-size: 30px;
+      color: darkgrey;
+      bottom: 194px;
+      left: 600px;
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
-    <img class="rectangle" src="{{ url_for('static', filename='img/rectangle5.png') }}"/>
+  <div class="container">
+    <img class="rectangle" src="{{ url_for('static', filename='img/rectangle5.png') }}" />
 
     <form action="/information" method="POST">
+      <div class="info-box">
+        <p class="entry">{{ info.entry }}</p>
+        <p class="name">{{ info.name }}</p>
+        <p class="wait_num">{{ info.wait_num }}</p>
+        <p class="wait_count1">{{ info.wait_count }}</p>
+        <p class="wait_count2">{{ info.wait_count }}</p>
+      </div>
 
-        <input type="text" name="student_id" placeholder="학번" required class="icon-input"
-               style="top: 100px; left: 250px;">
-        <input type="text" name="name" placeholder="이름" required class="icon-input" style="top: 150px; left: 250px;">
-        <input type="password" name="password" placeholder="비밀번호" required class="icon-input"
-               style="top: 200px; left: 250px;">
+      <button type="submit" class="cancel">
+        <img src="{{ url_for('static', filename='img/confirm_reservation.png') }}" />
+      </button>
 
-        <button type="submit" class="cancel" style="background:none; border:none; padding:0;">
-            <img src="{{ url_for('static', filename='img/confirm_reservation.png') }}"/>
-        </button>
-
-        <button type="button" class="confirm" onclick="history.back()" style="background:none; border:none; padding:0;">
-            <img src="{{ url_for('static', filename='img/cancel_reservation.png') }}"/>
-        </button>
-
+      <button type="button" class="confirm" onclick="history.back()">
+        <img src="{{ url_for('static', filename='img/cancel_reservation.png') }}" />
+      </button>
     </form>
-</div>
+  </div>
 </body>
+
 </html>
-
-
