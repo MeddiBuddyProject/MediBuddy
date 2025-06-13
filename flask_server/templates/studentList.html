@@ -78,7 +78,7 @@
         .name,
         .studentNum,
         .symptoms,
-        .checkbox {
+        .confirmation {
             margin-top: 6px;
             text-align: center;
         }
@@ -103,8 +103,9 @@
             width: 140px;
         }
 
-        .checkBox {
-            margin-left: 55px;
+        .confirmation {
+            margin-left: 10px;
+            width: 100px;
         }
     </style>
 </head>
@@ -128,7 +129,13 @@
                             {% endif %}
                         </p>
                         <p class="symptoms">{{ item.symptoms }}</p>
-                        <input type="checkbox" name="delete_ids" value="{{ reservation['_id'] }}">
+                        <p class="confirmation">
+                            {% if item.confirmation %}
+                            확인
+                            {% else %}
+                            미확인
+                            {% endif %}
+                        </p>
                     </div>
                     {% endfor %}
                 </div>
