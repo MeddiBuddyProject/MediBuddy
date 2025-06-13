@@ -160,7 +160,7 @@ def list_records():
     if request.method == 'POST':
         delete_ids = request.form.getlist('delete_ids')
         if delete_ids:
-            # ObjectId로 변환
+
             object_ids = [ObjectId(id) for id in delete_ids]
 
             health_records.update_many(
