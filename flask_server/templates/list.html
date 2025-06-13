@@ -128,13 +128,16 @@
                             {% endif %}
                         </p>
                         <p class="symptoms">{{ item.symptoms }}</p>
-                        <input type="checkbox" name="delete_ids" value="{{ reservation['_id'] }}">
+                        <input type="checkbox" name="delete_ids" value="{{ item['_id'] }}">
                     </div>
                     {% endfor %}
                 </div>
                 <button type="submit" style="background: none; border: none; padding: 0;">
                     <img class="check" src="{{ url_for('static', filename='img/check.svg') }}" alt="check">
                 </button>
+            </form>
+            <form action="/delete_all" method="POST" onsubmit="return confirm('정말 모든 데이터를 삭제하시겠습니까?');">
+                <button type="submit">모든 데이터 삭제</button>
             </form>
         </div>
     </div>

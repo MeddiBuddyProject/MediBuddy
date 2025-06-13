@@ -14,47 +14,6 @@ db = client['medibuddy_db']
 students = db['students']
 health_records = db['health_records']
 
-sample_students = [
-    {"student_id": "2107", "name": "이상연", "password": "1111"},
-    {"student_id": "2110", "name": "임채이", "password": "2222"},
-    {"student_id": "2115", "name": "조현서", "password": "3333"},
-]
-students.insert_many(sample_students)
-
-
-sample_health_records = [
-    {
-        "date": datetime(2025, 6, 6),
-        "student_id": "2107",
-        "name": "이상연",
-        "treatment": "스스로 치료",
-        "symptom_checked": True,
-        "symptoms": "코피",
-        "confirmation": False  
-    },
-    {
-        "date": datetime(2025, 6, 5),
-        "student_id": "2110",
-        "name": "임채이",
-        "treatment": "스스로 치료",
-        "symptom_checked": False,
-        "symptoms": "타박상",
-        "confirmation": False  
-    },
-    {
-        "date": datetime(2025, 6, 4),
-        "student_id": "2115",
-        "name": "조현서",
-        "treatment": "보건 선생님 도움",
-        "symptom_checked": True,
-        "symptoms": "복통",
-        "confirmation": False  
-    }
-]
-
-health_records.insert_many(sample_health_records)
-
-
 @app.route('/')
 def index():
     return render_template('information.html')
@@ -160,7 +119,7 @@ def list_records():
     if request.method == 'POST':
         delete_ids = request.form.getlist('delete_ids')
         if delete_ids:
-            # ObjectId로 변환
+
             object_ids = [ObjectId(id) for id in delete_ids]
 
             health_records.update_many(
@@ -191,6 +150,13 @@ def studentlist():
             record['date'] = record['date'].strftime("%Y-%m-%d")
     
     return render_template('studentlist.html', reservations=records)
+
+@app.route('/delete_all', methods=['POST'])
+def delete_all():
+    health_records.delete_many({})
+    students.delete_many({})
+    return redirect(url_for('list_records'))
+
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)
