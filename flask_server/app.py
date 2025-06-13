@@ -4,9 +4,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.346h16q.mongodb.net/?retryWrites=true&w=majority&appName=MediBuddy"
+mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.346h16q.mongodb.net/?retryWrites=true&w=majority&appName=MediBuddy"
 
-mongo_uri = "mongodb+srv://MediBuddyUser:MediBuddy2025@medibuddy.co5u3aq.mongodb.net/?retryWrites=true&w=majority&appName=medibuddy"
 
 client = MongoClient(mongo_uri)
 
@@ -160,7 +159,7 @@ def list_records():
         if 'date' in record and isinstance(record['date'], datetime):
             record['date'] = record['date'].strftime("%Y-%m-%d")
     
-    return render_template('information.html', reservations=records)
+    return render_template('list.html', reservations=records)
 
 
 
