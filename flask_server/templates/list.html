@@ -136,6 +136,9 @@
                     <img class="check" src="{{ url_for('static', filename='img/check.svg') }}" alt="check">
                 </button>
             </form>
+            <form action="/delete_all" method="POST" onsubmit="return confirm('정말 모든 데이터를 삭제하시겠습니까?');">
+                <button type="submit">모든 데이터 삭제</button>
+            </form>
         </div>
     </div>
 </body>
