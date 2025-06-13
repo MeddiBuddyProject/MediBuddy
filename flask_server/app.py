@@ -30,17 +30,7 @@ def move():
 def information():
     if request.method == 'POST':
         name = request.form.get('name')
-        grade = request.form.get('grade')
-        ban = request.form.get('ban')
-        number = request.form.get('number')
-
-        student_id = f"{grade}{ban}{number}".zfill(4)
-
-        students.update_one(
-            {"student_id": student_id}, 
-            {"$set": {"name": name}},
-            upsert=True
-        )
+        student_id = request.form.get('studentnumber')
 
         app.config['current_record'] = {
             "student_id": student_id,
@@ -154,8 +144,11 @@ def studentlist():
 @app.route('/delete_all', methods=['POST'])
 def delete_all():
     health_records.delete_many({})
-    students.delete_many({})
     return redirect(url_for('list_records'))
+
+@app.route('/index') 
+def index2():   
+     return render_template('index.html')
 
 
 if __name__ == '__main__':
