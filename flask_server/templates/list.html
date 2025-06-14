@@ -69,8 +69,16 @@
             height: 100px;
             position: absolute;
             bottom: -150px;
-            left: 50%;
+            left: 75%;
             transform: translateX(-50%);
+        }
+
+        .back {
+            width: 300px;
+            height: 100px;
+            position: absolute;
+            bottom: -150px;
+            left: 40px;
         }
 
         .date,
@@ -103,8 +111,8 @@
             width: 140px;
         }
 
-        .checkBox {
-            margin-left: 55px;
+        .checkbox {
+            margin-left: 52px;
         }
     </style>
 </head>
@@ -121,19 +129,25 @@
                         <p class="studentNum">{{ item.student_id }}</p>
                         <p class="name">{{ item.name }}</p>
                         <p class="cure">
-                            {% if item.treatment == "스스로 치료" %}
+                            {% if item.treatment %}
                             자가치료
                             {% else %}
                             선생님 치료
                             {% endif %}
                         </p>
                         <p class="symptoms">{{ item.symptoms }}</p>
-                        <input type="checkbox" name="delete_ids" value="{{ item['_id'] }}">
+                        <div class="checkbox">
+                            <input type="checkbox" name="delete_ids" value="{{ item['_id'] }}">
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
                 <button type="submit" style="background: none; border: none; padding: 0;">
                     <img class="check" src="{{ url_for('static', filename='img/check.svg') }}" alt="check">
+                </button>
+                <button type="button" onclick="window.location.href='/'"
+                    style="background: none; border: none; padding: 0;">
+                    <img class="back" src="{{ url_for('static', filename='img/back.svg') }}" alt="back">
                 </button>
             </form>
             <form action="/delete_all" method="POST" onsubmit="return confirm('정말 모든 데이터를 삭제하시겠습니까?');">
