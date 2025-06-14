@@ -43,7 +43,7 @@
       left: 250px;
     }
 
-    .confirm:hover {
+    .confirm:hover{
       transform: scale(1.05);
     }
 
@@ -117,19 +117,20 @@
   <div class="container">
     <img class="rectangle" src="{{ url_for('static', filename='img/rectangle5.png') }}" />
 
-    <div class="info-box">
-      <p class="entry">{{ info.wait_count1_num }}</p>
-      <p class="name">{{ info.name }}</p>
-      <p class="wait_num">{{ info.my_wait_num }}</p>
-      <p class="wait_count1">{{ info.wait_count2 }}</p>
-      <p class="wait_count2">{{ info.wait_count3 }}</p>
-    </div>
+    <form action="/information" method="POST">
+      <div class="info-box">
+        <p class="entry">{{ info.wait_count1_num }}</p>
+        <p class="name">{{ info.name }}</p>
+        <p class="wait_num">{{ info.my_wait_num }}</p>
+        <p class="wait_count1">{{ info.wait_count2}}</p>
+        <p class="wait_count2">{{ info.wait_count3 }}</p>
+      </div>
 
-    <a href="{{ url_for('move') }}">
-      <button type="button" class="confirm">
+      <button type="submit" class="confirm">
         <img src="{{ url_for('static', filename='img/confirm_reservation.png') }}" />
       </button>
-    </a>
+
+    </form>
   </div>
 </body>
 

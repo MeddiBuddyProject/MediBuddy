@@ -118,32 +118,27 @@ def symptoms():
 
     return render_template('symptoms.html')
 
-@app.route('/final', methods=['GET'])
+@app.route('/final')
 def final():
-    # 세션에서 현재 사용자 정보 가져오기
-    record = session.get('current_record')
-    if not record:
-        flash("로그인이 만료되었습니다. 다시 로그인해주세요.")
-        return redirect(url_for('information'))
+    r = health_records.find_one(sort=[('date', -1)])
+    if not r:
+        return render_template('final.html', info={})
 
-    sid = record['student_id']
-    name = record['name']
-    date = record['date']
+    sid, name, date = r['student_id'], r['name'], r['date']
 
     all_records = list(health_records.find().sort("date", 1))
+
     total_num = health_records.count_documents({"confirmation": False})
 
-    my_reservation_order = next((i + 1 for i, x in enumerate(all_records)
-                                if x['student_id'] == sid and x['date'] == date), -1)
+    my_reservation_order = next((i+1 for i, x in enumerate(all_records) if x['student_id'] == sid and x['date'] == date), -1)
 
     return render_template('final.html', info={
         'name': name,
-        'student_id': sid,
         'my_wait_num': my_reservation_order,
         'wait_count1': total_num,
         'wait_count2': total_num,
-        'wait_count3': total_num,
-        'wait_count1_num': total_num
+        'wait_count3': total_num
+        
     })
 
 @app.route('/list', methods=['GET', 'POST'])
