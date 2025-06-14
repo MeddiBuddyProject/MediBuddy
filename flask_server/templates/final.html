@@ -40,15 +40,10 @@
     }
 
     .confirm {
-      left: 100px;
+      left: 250px;
     }
 
-    .cancel {
-      right: 280px;
-    }
-
-    .confirm:hover,
-    .cancel:hover {
+    .confirm:hover{
       transform: scale(1.05);
     }
 
@@ -124,20 +119,17 @@
 
     <form action="/information" method="POST">
       <div class="info-box">
-        <p class="entry">{{ info.entry }}</p>
+        <p class="entry">{{ info.wait_count1_num }}</p>
         <p class="name">{{ info.name }}</p>
-        <p class="wait_num">{{ info.wait_num }}</p>
-        <p class="wait_count1">{{ info.wait_count }}</p>
-        <p class="wait_count2">{{ info.wait_count }}</p>
+        <p class="wait_num">{{ info.my_wait_num }}</p>
+        <p class="wait_count1">{{ info.wait_count2}}</p>
+        <p class="wait_count2">{{ info.wait_count3 }}</p>
       </div>
 
-      <button type="submit" class="cancel">
+      <button type="submit" class="confirm">
         <img src="{{ url_for('static', filename='img/confirm_reservation.png') }}" />
       </button>
 
-      <button type="button" class="confirm" onclick="history.back()">
-        <img src="{{ url_for('static', filename='img/cancel_reservation.png') }}" />
-      </button>
     </form>
   </div>
 </body>

@@ -93,15 +93,19 @@ def final():
 
     sid, name, date = r['student_id'], r['name'], r['date']
 
-    all = list(health_records.find().sort("date", 1))
-    wait = list(health_records.find({"treatment": {"$exists": False}}).sort("date", 1))
+    all_records = list(health_records.find().sort("date", 1))
 
-    entry = next((i+1 for i, x in enumerate(all) if x['student_id'] == sid and x['date'] == date), -1)
-    wnum = next((i+1 for i, x in enumerate(wait) if x['student_id'] == sid and x['date'] == date), -1)
-    wcount = len(wait)
+    total_num = health_records.count_documents({"confirmation": False})
+
+    my_reservation_order = next((i+1 for i, x in enumerate(all_records) if x['student_id'] == sid and x['date'] == date), -1)
 
     return render_template('final.html', info={
-        'entry': entry, 'name': name, 'wait_num': wnum, 'wait_count': wcount
+        'name': name,
+        'my_wait_num': my_reservation_order,
+        'wait_count1': total_num,
+        'wait_count2': total_num,
+        'wait_count3': total_num
+        
     })
 
 @app.route('/list', methods=['GET', 'POST'])
