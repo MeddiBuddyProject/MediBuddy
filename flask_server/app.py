@@ -138,6 +138,7 @@ def final():
         'wait_count1': total_num,
         'wait_count2': total_num,
         'wait_count3': total_num
+        'wait_count1_num': total_num
         
     })
 
