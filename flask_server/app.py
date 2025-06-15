@@ -120,27 +120,13 @@ def symptoms():
 
 @app.route('/final')
 def final():
-    r = health_records.find_one(sort=[('date', -1)])
-    if not r:
-        return render_template('final.html', info={})
+    if 'current_record' not in session:
+        flash("로그인이 필요합니다.")
+        return redirect(url_for('information'))
 
-    sid, name, date = r['student_id'], r['name'], r['date']
+    return render_template('final.html')
 
-    all_records = list(health_records.find().sort("date", 1))
 
-    total_num = health_records.count_documents({"confirmation": False})
-
-    my_reservation_order = next((i+1 for i, x in enumerate(all_records) if x['student_id'] == sid and x['date'] == date), -1)
-
-    return render_template('final.html', info={
-        'name': name,
-        'my_wait_num': my_reservation_order,
-        'wait_count1': total_num,
-        'wait_count2': total_num,
-        'wait_count3': total_num
-        'wait_count1_num': total_num
-        
-    })
 
 @app.route('/list', methods=['GET', 'POST'])
 def list_records():
