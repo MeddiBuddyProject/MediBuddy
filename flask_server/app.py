@@ -116,6 +116,7 @@ def symptoms():
 
 @app.route('/final', methods=['GET'])
 def final():
+<<<<<<< HEAD
     record = session.get('current_record')
     if not record:
         flash("로그인이 만료되었습니다. 다시 로그인해주세요.")
@@ -151,6 +152,16 @@ def final():
         'wait_count1_num': today_confirmed_count + 1     
     })
     
+=======
+    if 'current_record' not in session:
+        flash("로그인이 필요합니다.")
+        return redirect(url_for('information'))
+
+    return render_template('final.html')
+
+
+
+>>>>>>> 897e076a7c6cc0ea8c0903c196b64394f00c7fc2
 @app.route('/list', methods=['GET', 'POST'])
 def list_records():
     record = session.get('current_record')
