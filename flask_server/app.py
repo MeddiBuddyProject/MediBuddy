@@ -116,52 +116,12 @@ def symptoms():
 
 @app.route('/final', methods=['GET'])
 def final():
-<<<<<<< HEAD
-    record = session.get('current_record')
-    if not record:
-        flash("로그인이 만료되었습니다. 다시 로그인해주세요.")
-        return redirect(url_for('information'))
-
-    sid = record['student_id']
-    name = record['name']
-    date = record['date']
-
-    today = datetime.now().strftime('%Y-%m-%d')
-
-    today_confirmed_count = health_records.count_documents({
-        "date": today,
-        "confirmation": True
-    })
-
-    today_unconfirmed_count = health_records.count_documents({
-        "date": today,
-        "confirmation": False
-    })
-
-    all_today_records = list(health_records.find({"date": today}).sort("date", 1))
-
-    my_reservation_order = next((i + 1 for i, x in enumerate(all_today_records)
-                                 if x['student_id'] == sid and x['date'] == date), -1)
-
-    return render_template('final.html', info={
-        'name': name,
-        'student_id': sid,
-        'my_wait_num': my_reservation_order,        
-        'wait_count1': today_unconfirmed_count,        
-        'wait_count2': today_unconfirmed_count,
-        'wait_count1_num': today_confirmed_count + 1     
-    })
-    
-=======
     if 'current_record' not in session:
         flash("로그인이 필요합니다.")
         return redirect(url_for('information'))
 
     return render_template('final.html')
 
-
-
->>>>>>> 897e076a7c6cc0ea8c0903c196b64394f00c7fc2
 @app.route('/list', methods=['GET', 'POST'])
 def list_records():
     record = session.get('current_record')
