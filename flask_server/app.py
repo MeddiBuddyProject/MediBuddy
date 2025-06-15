@@ -31,7 +31,6 @@ def move():
         student_id = request.form.get('studentnumber', '').strip()
         password = request.form.get('password', '').strip()
 
-        # 로그인 정보 확인
         matched_student = students.find_one({
             'student_id': student_id,
             'name': name,
@@ -42,7 +41,6 @@ def move():
             flash("학번 또는 비밀번호가 틀렸습니다.")
             return redirect(url_for('information'))
 
-        # 로그인 성공 시 세션에 기록 저장
         session['current_record'] = {
             "student_id": student_id,
             "name": name,
@@ -55,10 +53,8 @@ def move():
 
         return redirect(url_for('move'))
 
-    # GET 요청 처리
     record = session.get('current_record')
     if not record:
-        # 로그인 안 되어 있으면 로그인 페이지로
         return redirect(url_for('information'))
 
     select = request.args.get('select')
@@ -76,21 +72,21 @@ def move():
 @app.route('/cure_method', methods=['GET', 'POST'])
 def cure_method():
     if request.method == 'POST':
-        treatment = request.form.get('isSelf')
+        treatment_str = request.form.get('treatment')
 
         if 'current_record' not in session:
             flash("저장된 환자 정보가 없습니다.", "error")
             return redirect(url_for('information'))
 
+        treatment_bool = treatment_str == 'true'
+
         record = session.get('current_record')
-        record['treatment'] = treatment
-        session['current_record'] = record 
+        record['treatment'] = treatment_bool
+        session['current_record'] = record
 
         return redirect(url_for('symptoms'))
 
     return render_template('cure_method.html')
-
-
 
 @app.route('/symptoms', methods=['GET', 'POST'])
 def symptoms():
@@ -118,36 +114,48 @@ def symptoms():
 
     return render_template('symptoms.html')
 
-@app.route('/final')
+@app.route('/final', methods=['GET'])
 def final():
-    r = health_records.find_one(sort=[('date', -1)])
-    if not r:
-        return render_template('final.html', info={})
+    record = session.get('current_record')
+    if not record:
+        flash("로그인이 만료되었습니다. 다시 로그인해주세요.")
+        return redirect(url_for('information'))
 
-    sid, name, date = r['student_id'], r['name'], r['date']
+    sid = record['student_id']
+    name = record['name']
+    date = record['date']
 
-    all_records = list(health_records.find().sort("date", 1))
+    today = datetime.now().strftime('%Y-%m-%d')
 
-    total_num = health_records.count_documents({"confirmation": False})
+    today_confirmed_count = health_records.count_documents({
+        "date": today,
+        "confirmation": True
+    })
 
-    my_reservation_order = next((i+1 for i, x in enumerate(all_records) if x['student_id'] == sid and x['date'] == date), -1)
+    today_unconfirmed_count = health_records.count_documents({
+        "date": today,
+        "confirmation": False
+    })
+
+    all_today_records = list(health_records.find({"date": today}).sort("date", 1))
+
+    my_reservation_order = next((i + 1 for i, x in enumerate(all_today_records)
+                                 if x['student_id'] == sid and x['date'] == date), -1)
 
     return render_template('final.html', info={
         'name': name,
-        'my_wait_num': my_reservation_order,
-        'wait_count1': total_num,
-        'wait_count2': total_num,
-        'wait_count3': total_num
-        'wait_count1_num': total_num
-        
+        'student_id': sid,
+        'my_wait_num': my_reservation_order,        
+        'wait_count1': today_unconfirmed_count,        
+        'wait_count2': today_unconfirmed_count,
+        'wait_count1_num': today_confirmed_count + 1     
     })
-
+    
 @app.route('/list', methods=['GET', 'POST'])
 def list_records():
     record = session.get('current_record')
     if not record or not record.get('is_root'):
-        flash("권한이 없습니다.")
-        return redirect(url_for('information'))
+        return redirect(url_for('move'))
 
     if request.method == 'POST':
         delete_ids = request.form.getlist('delete_ids')
@@ -198,8 +206,7 @@ def studentlist():
         return "학번이 전달되지 않았습니다.", 400
 
     if student_id != record.get('student_id'):
-        flash("본인 정보만 조회할 수 있습니다.")
-        return redirect(url_for('information'))
+        return redirect(url_for('move'))
 
     query = {"student_id": student_id}
     records = list(health_records.find(query).sort("date", -1))
@@ -238,7 +245,6 @@ def change_password():
     current_pass = request.form.get('currentPass', '').strip()
     new_pass = request.form.get('newPass', '').strip()
     
-    # 세션에 저장된 현재 로그인 사용자 정보 가져오기
     record = session.get('current_record')
     if not record:
         flash("로그인이 필요합니다.")
@@ -246,14 +252,12 @@ def change_password():
     
     student_id = record.get('student_id')
 
-    # DB에서 현재 학생 정보 조회
     student = students.find_one({'student_id': student_id})
 
     if not student or student.get('password') != current_pass:
         flash("현재 비밀번호가 틀렸습니다.")
         return redirect(url_for('editpassword'))
 
-    # 비밀번호 변경 처리
     students.update_one({'student_id': student_id}, {'$set': {'password': new_pass}})
 
     flash("비밀번호가 성공적으로 변경되었습니다.")
@@ -264,5 +268,7 @@ def logout():
     session.clear()
     flash("로그아웃되었습니다.")
     return redirect(url_for('information')) 
+
+
 if __name__ == '__main__':
     app.run(debug=True,port=5001)
