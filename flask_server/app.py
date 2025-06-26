@@ -51,7 +51,7 @@ def move():
         if name == 'root':
             return redirect(url_for('list_records'))
 
-        return redirect(url_for('move'))
+        return redirect(url_for('move')) #post
 
     record = session.get('current_record')
     if not record:
@@ -67,7 +67,7 @@ def move():
             return redirect(url_for('information'))
         return redirect(url_for('studentlist', student_id=student_id))
 
-    return render_template('main.html', name=record["name"], student_id=record["student_id"])
+    return render_template('main.html')
 
 @app.route('/cure_method', methods=['GET', 'POST'])
 def cure_method():
@@ -98,14 +98,12 @@ def symptoms():
             return redirect(url_for('information')) 
 
         record = session['current_record']
-        symptom_checked = bool(symptoms and symptoms.strip())
 
         health_records.insert_one({
             "date": record['date'],
             "student_id": record['student_id'],
             "name": record['name'],
             "treatment": record.get('treatment', ''),
-            "symptom_checked": symptom_checked,
             "symptoms": symptoms,
             "confirmation": False
         })
@@ -132,7 +130,11 @@ def list_records():
         delete_ids = request.form.getlist('delete_ids')
         if delete_ids:
             try:
-                object_ids = [ObjectId(id) for id in delete_ids]
+                object_ids = []
+                for id in delete_ids:
+                    obj_id = ObjectId(id)
+                    object_ids.append(obj_id)
+                    
                 health_records.update_many(
                     {"_id": {"$in": object_ids}},
                     {"$set": {"confirmation": True}}
@@ -166,15 +168,13 @@ def studentlist():
         flash("로그인이 필요합니다.")
         return redirect(url_for('information'))
     
+    student_id = request.args.get('student_id')
     if request.method == 'POST':
         return redirect(url_for('move'))
 
-    student_id = request.args.get('student_id')
-    if request.method == 'POST':
-        student_id = request.form.get('student_id', student_id)
-
     if not student_id:
-        return "학번이 전달되지 않았습니다.", 400
+        flash("학번이 전달되지 않았습니다.")
+        return redirect(url_for('information'))
 
     if student_id != record.get('student_id'):
         return redirect(url_for('move'))
@@ -197,10 +197,10 @@ def studentlist():
     return render_template('studentlist.html', reservations=records, student_id=student_id)
 
 
-@app.route('/delete_all', methods=['POST'])
-def delete_all():
-    health_records.delete_many({})
-    return redirect(url_for('list_records'))
+# @app.route('/delete_all', methods=['POST'])
+# def delete_all():
+#     health_records.delete_many({})
+#     return redirect(url_for('list_records'))
 
 
 @app.route('/editpassword', methods=['GET'])
